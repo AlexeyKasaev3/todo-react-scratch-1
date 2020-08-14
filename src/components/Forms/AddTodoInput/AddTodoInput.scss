@@ -1,0 +1,15 @@
+@import '../../../scss/variables';
+
+.addTodoInput {
+  padding: 15px 0;
+  display: block;
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 24px;
+
+  &::placeholder {
+    font-style: italic;
+    color: $placeholderColor;
+  }
+}

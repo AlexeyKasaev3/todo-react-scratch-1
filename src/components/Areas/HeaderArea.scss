@@ -1,0 +1,16 @@
+@import '../../scss/variables';
+
+.headerArea {
+  display: flex;
+  background: #fff;
+  height: 60px;
+  border-bottom: 1px solid $borderColor;
+}
+
+.arrowSelectorContainer {
+  flex: 0 0 65px;
+}
+
+.addTodoInputContainer {
+  flex: 1 0 auto;
+}

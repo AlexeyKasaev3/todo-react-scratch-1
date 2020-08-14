@@ -1,0 +1,31 @@
+.arrowSelector {
+  display: flex;
+  overflow: hidden;
+  margin: 0;
+  cursor: pointer;
+  width: 60px;
+  height: 60px;
+  background: transparent;
+  border: none;
+  outline: none;
+  justify-content: center;
+  align-items: center;
+  transform: rotate(90deg);
+
+  &:before {
+    content: '❯';
+    font-size: 22px;
+  }
+
+  &.invisible {
+    display: none;
+  }
+
+  &.halfVisible {
+    opacity: 0.2;
+  }
+
+  &.visible {
+    opacity: 1;
+  }
+}
