@@ -16,7 +16,7 @@ export function TodoList() {
   return filteredTodos ? (
     <>
       {Object.values(filteredTodos).map((todo) => {
-        return <TodoListItem {...todo} key={todo.id} />
+        return <TodoListItem {...todo} key={todo._id} />
       })}
     </>
   ) : null

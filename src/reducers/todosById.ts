@@ -19,7 +19,7 @@ export function todosById(state: ITodosById = {}, action: IAction): ITodosById {
   switch (action.type) {
     case addNewTodoAction.toString(): {
       const newTodo: ITodo = action.payload
-      return { ...state, [newTodo.id]: newTodo }
+      return { ...state, [newTodo._id]: newTodo }
     }
     case toggleTodoCompleteStatusAction.toString():
       const todoId: string = action.payload
@@ -72,7 +72,7 @@ export function todosById(state: ITodosById = {}, action: IAction): ITodosById {
       todos.forEach(
         (todo) =>
           (populatedState[todo._id] = {
-            id: todo._id,
+            _id: todo._id,
             text: todo.text,
             isComplete: todo.isComplete,
           })
@@ -85,7 +85,7 @@ export function todosById(state: ITodosById = {}, action: IAction): ITodosById {
 }
 
 export interface ITodo {
-  id: string
+  _id: string
   text: string
   isComplete: boolean
 }

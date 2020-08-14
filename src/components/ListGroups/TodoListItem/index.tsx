@@ -11,22 +11,22 @@ import { TodoListItemEditModeComponent } from '../../Forms/TodoListItemEditMode'
 import { useDispatch } from 'react-redux'
 
 type Props = {
-  id: string
+  _id: string
   text: string
   isComplete: boolean
 }
 
-export const TodoListItem: React.FC<Props> = ({ id, text, isComplete }) => {
+export const TodoListItem: React.FC<Props> = ({ _id, text, isComplete }) => {
   const dispatch = useDispatch()
   const [isInEditMode, setIsInEditMode] = useState(false)
   const [todoText, setTodoText] = useState(text)
 
   function onCompleteStatusChangeHandler() {
-    dispatch(toggleTodoCompleteStatusAction(id))
+    dispatch(toggleTodoCompleteStatusAction(_id))
   }
 
   function onDeleteHandler() {
-    dispatch(deleteTodoAction(id))
+    dispatch(deleteTodoAction(_id))
   }
 
   function onDoubleClickHandler() {
@@ -52,9 +52,9 @@ export const TodoListItem: React.FC<Props> = ({ id, text, isComplete }) => {
   function performTodoUpdateTextStuff() {
     if (todoText.trim()) {
       setIsInEditMode(false)
-      dispatch(editTodoTextAction({ id, todoText }))
+      dispatch(editTodoTextAction({ _id, todoText }))
     } else {
-      dispatch(deleteTodoAction(id))
+      dispatch(deleteTodoAction(_id))
     }
   }
 

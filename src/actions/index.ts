@@ -30,7 +30,7 @@ export const toggleTodoCompleteStatusAction = createAction<string>(
 export const deleteTodoAction = createAction<string>('delete todo')
 
 export const editTodoTextAction = createAction<{
-  id: string
+  _id: string
   todoText: string
 }>('edit todo action')
 
