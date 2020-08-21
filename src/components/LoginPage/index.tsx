@@ -3,30 +3,50 @@ import { Formik } from 'formik'
 import './LoginPage.scss'
 import { AuthenticateFormField } from '../Forms/AuthenticateFormField'
 import { AuthentificateFormSubmitButton } from '../Buttons/AuthentificateFormSubmitButton'
+import { loginFormSubmitAction } from '../../actions'
+import { useDispatch, useSelector } from 'react-redux'
+import { Redirect } from 'react-router-dom'
+import { IStore } from '../../configureStore'
+import { AuthorisationStatus } from '../../reducers/authorisationStatus'
+import { wrongLoginOrPasswordAction } from './actions'
 
 export const LoginPage: React.FC = () => {
+  const dispatch = useDispatch()
+  const userAuthStatus = useSelector<IStore, AuthorisationStatus>(
+    (state) => state.authorisationStatus
+  )
+  const isWrongLoginOrPass = useSelector<IStore, boolean>(
+    (state) => state.isLoginPageError
+  )
+
+  function resetFormError() {
+    if (isWrongLoginOrPass) {
+      dispatch(wrongLoginOrPasswordAction(false))
+    }
+  }
   return (
     <>
       <p className="text-center mb-30">Welcome back!</p>
       <Formik
-        initialValues={{ email: '', password: '' }}
+        initialValues={{ userEmail: '', userPassword: '' }}
         validate={(values) => {
           const errors: any = {}
-          if (!values.email) {
-            errors.email = 'Please enter your email'
+          if (!values.userEmail) {
+            errors.userEmail = 'Please enter your email'
           } else if (
-            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
+            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.userEmail)
           ) {
-            errors.email = 'Invalid email address'
+            errors.userEmail = 'Invalid email address'
           }
 
-          if (!values.password) {
-            errors.password = 'Please enter your password'
+          if (!values.userPassword) {
+            errors.userPassword = 'Please enter your password'
           }
           return errors
         }}
-        onSubmit={(values, { setSubmitting }) => {
-          alert(JSON.stringify(values, null, 2))
+        onSubmit={async (values, { setSubmitting }) => {
+          const { userEmail, userPassword } = values
+          await dispatch(loginFormSubmitAction({ userEmail, userPassword }))
           setSubmitting(false)
         }}
       >
@@ -39,34 +59,43 @@ export const LoginPage: React.FC = () => {
           handleSubmit,
           isSubmitting,
         }) => (
-          <form onSubmit={handleSubmit} className="loginForm" noValidate>
+          <form
+            onSubmit={handleSubmit}
+            className="loginForm"
+            noValidate
+            onKeyDown={resetFormError}
+          >
             <AuthenticateFormField
               type="email"
-              name="email"
+              name="userEmail"
               onChange={handleChange}
               onBlur={handleBlur}
-              value={values.email}
+              value={values.userEmail}
               placeholder="Your email"
             />
 
-            {errors.email && touched.email && (
-              <div className="inputValidationError">{errors.email}</div>
+            {errors.userEmail && touched.userEmail && (
+              <div className="inputValidationError">{errors.userEmail}</div>
             )}
             <AuthenticateFormField
               type="password"
-              name="password"
+              name="userPassword"
               onChange={handleChange}
               onBlur={handleBlur}
-              value={values.password}
+              value={values.userPassword}
               placeholder="Password"
             />
-            {errors.password && touched.password && (
-              <div className="inputValidationError">{errors.password}</div>
+            {errors.userPassword && touched.userPassword && (
+              <div className="inputValidationError">{errors.userPassword}</div>
             )}
+            {isWrongLoginOrPass ? (
+              <div className="formError">Wrong login or password</div>
+            ) : null}
             <AuthentificateFormSubmitButton isSubmitting={isSubmitting} />
           </form>
         )}
       </Formik>
+      {userAuthStatus === 'loggedIn' ? <Redirect to="/all" /> : null}
     </>
   )
 }

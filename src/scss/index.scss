@@ -76,3 +76,10 @@ h6 {
     border-bottom: 10px solid #b9b9b9;
   }
 }
+
+.formError {
+  text-align: center;
+  padding: 10px;
+  animation: headShake;
+  animation-duration: 1s;
+}

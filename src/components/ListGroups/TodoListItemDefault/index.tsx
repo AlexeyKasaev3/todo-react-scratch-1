@@ -19,7 +19,7 @@ export const TodoListItemDefaultComponent: React.FC<Props> = ({
   onDoubleClickHandler,
 }) => {
   function isDoubleClickOnDiv(event: React.MouseEvent<HTMLDivElement>) {
-    return event.currentTarget.tagName === 'DIV'
+    return (event.target as HTMLInputElement).tagName === 'DIV'
   }
 
   return (

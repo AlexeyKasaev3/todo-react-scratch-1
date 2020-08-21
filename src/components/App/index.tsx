@@ -7,27 +7,57 @@ import { TodoListFooter } from '../TodoListFooter'
 
 import './App.scss'
 import { useDispatch, useSelector } from 'react-redux'
-import { initialFetchAllTodosAction, hasTodosSelector } from '../../actions'
+import {
+  initialFetchAllTodosAction,
+  hasTodosSelector,
+  setAuthorisationStatusAction,
+  determineAndSetLogginStatusAction,
+} from '../../actions'
 
 import { IStore } from '../../configureStore'
-import { BrowserRouter, Link, Route } from 'react-router-dom'
+import { BrowserRouter, Link, Route, Redirect } from 'react-router-dom'
 import { LoginPage } from '../LoginPage'
 import { RegisterPage } from '../RegisterPage'
+import { InternetOrServerProblemPopover } from '../Popovers/InternetOrServerProblemPopover'
+import { AuthorisationStatus } from '../../reducers/authorisationStatus'
+import { getDecodedJwtPayloadField } from '../../helpers/getDecodedJwtPayload'
 
 export function App() {
   const dispatch = useDispatch()
   const hasTodos = useSelector<IStore, boolean>(hasTodosSelector)
+  const isInternetOrServerProblems = useSelector<IStore, boolean>(
+    (state) => state.internetOrServerProblems
+  )
+  const authorisationStatus = useSelector<IStore, AuthorisationStatus>(
+    (state) => state.authorisationStatus
+  )
   const appContainerClasses = cn('appContainer', 'mx-auto', 'pt-30')
   const headerClasses =
     'text-center mb-30 mt-0 font-weight-light fColorHeader fSize100'
 
   useEffect(() => {
-    dispatch(initialFetchAllTodosAction())
+    dispatch(determineAndSetLogginStatusAction())
   }, [])
+
+  useEffect(() => {
+    if (authorisationStatus === 'loggedIn') {
+      dispatch(initialFetchAllTodosAction())
+    }
+  }, [authorisationStatus])
+
+  function onLogoutButtonClick() {
+    localStorage.removeItem('tokensStatusData')
+    dispatch(setAuthorisationStatusAction('loggedOut'))
+  }
 
   return (
     <div className={appContainerClasses}>
       <BrowserRouter>
+        {authorisationStatus === 'loggedIn' ? (
+          <Redirect to="/all" />
+        ) : (
+          <Redirect to="/" />
+        )}
         <h1 className={headerClasses}>
           <Link to="/">todos</Link>
         </h1>
@@ -45,11 +75,24 @@ export function App() {
           </div>
         </Route>
         <Route path={['/all', '/active', '/completed']}>
-          <div className="appControlWrapper">
-            <HeaderAreaComponent />
-            <TodoList />
-            {hasTodos ? <TodoListFooter /> : null}
-          </div>
+          <>
+            <div className="appControlWrapper">
+              <HeaderAreaComponent />
+              <TodoList />
+              {hasTodos ? <TodoListFooter /> : null}
+            </div>
+            {authorisationStatus === 'loggedIn' ? (
+              <>
+                <p className="mb-30 text-center">
+                  You are logged in as{' '}
+                  <b>{getDecodedJwtPayloadField('userEmail')}</b>
+                </p>
+                <button className="logoutButton" onClick={onLogoutButtonClick}>
+                  Logout
+                </button>
+              </>
+            ) : null}
+          </>
         </Route>
         <Route path="/login">
           <LoginPage />
@@ -58,6 +101,7 @@ export function App() {
           <RegisterPage />
         </Route>
       </BrowserRouter>
+      {isInternetOrServerProblems ? <InternetOrServerProblemPopover /> : null}
     </div>
   )
 }

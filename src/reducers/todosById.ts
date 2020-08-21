@@ -8,9 +8,8 @@ import {
   editTodoTextAction,
   populateStoreWithFetchedTodosAction,
 } from '../actions'
-import { IFetchedTodo } from '../api'
 
-interface IAction {
+export interface IAction {
   type: string
   payload?: any
 }
@@ -59,7 +58,7 @@ export function todosById(state: ITodosById = {}, action: IAction): ITodosById {
       return newState
     }
     case editTodoTextAction.toString(): {
-      const todoId: string = action.payload.id
+      const todoId: string = action.payload._id
       const newTodoText = action.payload.todoText
       return {
         ...state,
@@ -67,7 +66,7 @@ export function todosById(state: ITodosById = {}, action: IAction): ITodosById {
       }
     }
     case populateStoreWithFetchedTodosAction.toString(): {
-      const todos: IFetchedTodo[] = action.payload
+      const todos: ITodo[] = action.payload
       const populatedState: ITodosById = {}
       todos.forEach(
         (todo) =>

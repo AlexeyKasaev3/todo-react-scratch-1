@@ -3,32 +3,54 @@ import { Formik } from 'formik'
 import './RegisterPage.scss'
 import { AuthenticateFormField } from '../Forms/AuthenticateFormField'
 import { AuthentificateFormSubmitButton } from '../Buttons/AuthentificateFormSubmitButton'
+import { useDispatch, useSelector } from 'react-redux'
+import { registerFormSubmitAction } from '../../actions'
+import { Redirect } from 'react-router-dom'
+import { IStore } from '../../configureStore'
+import { AuthorisationStatus } from '../../reducers/authorisationStatus'
+import { wrongLoginOrPasswordAction } from '../LoginPage/actions'
 
 export const RegisterPage: React.FC = () => {
+  const dispatch = useDispatch()
+
+  const userAuthStatus = useSelector<IStore, AuthorisationStatus>(
+    (state) => state.authorisationStatus
+  )
+  const isUserAlreadyExists = useSelector<IStore, boolean>(
+    (state) => state.isRegisterPageError
+  )
+
+  function resetFormError() {
+    if (isUserAlreadyExists) {
+      dispatch(wrongLoginOrPasswordAction(false))
+    }
+  }
+
   return (
     <>
       <p className="text-center mb-30">
         Please enter your email and password to register
       </p>
       <Formik
-        initialValues={{ email: '', password: '' }}
+        initialValues={{ userEmail: '', userPassword: '' }}
         validate={(values) => {
           const errors: any = {}
-          if (!values.email) {
-            errors.email = 'Please enter your email'
+          if (!values.userEmail) {
+            errors.userEmail = 'Please enter your email'
           } else if (
-            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
+            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.userEmail)
           ) {
-            errors.email = 'Invalid email address'
+            errors.userEmail = 'Invalid email address'
           }
 
-          if (!values.password) {
-            errors.password = 'Please enter your password'
+          if (!values.userPassword) {
+            errors.userPassword = 'Please enter your password'
           }
           return errors
         }}
         onSubmit={(values, { setSubmitting }) => {
-          alert(JSON.stringify(values, null, 2))
+          const { userEmail, userPassword } = values
+          dispatch(registerFormSubmitAction({ userEmail, userPassword }))
           setSubmitting(false)
         }}
       >
@@ -42,35 +64,46 @@ export const RegisterPage: React.FC = () => {
           isSubmitting,
           /* and other goodies */
         }) => (
-          <form onSubmit={handleSubmit} className="loginForm" noValidate>
+          <form
+            onSubmit={handleSubmit}
+            className="loginForm"
+            noValidate
+            onKeyDown={resetFormError}
+          >
             <AuthenticateFormField
               type="email"
-              name="email"
+              name="userEmail"
               onChange={handleChange}
               onBlur={handleBlur}
-              value={values.email}
+              value={values.userEmail}
               placeholder="Your email"
             />
-            {errors.email && touched.email && (
-              <div className="inputValidationError">{errors.email}</div>
+            {errors.userEmail && touched.userEmail && (
+              <div className="inputValidationError">{errors.userEmail}</div>
             )}
             <AuthenticateFormField
               type="password"
-              name="password"
+              name="userPassword"
               onChange={handleChange}
               onBlur={handleBlur}
-              value={values.password}
+              value={values.userPassword}
               placeholder="Password"
             />
-            {errors.password && touched.password && (
-              <div className="inputValidationError">{errors.password}</div>
+            {errors.userPassword && touched.userPassword && (
+              <div className="inputValidationError">{errors.userPassword}</div>
             )}
+            {isUserAlreadyExists ? (
+              <div className="formError">
+                User with this email already exists
+              </div>
+            ) : null}
             <AuthentificateFormSubmitButton isSubmitting={isSubmitting}>
               Submit
             </AuthentificateFormSubmitButton>
           </form>
         )}
       </Formik>
+      {userAuthStatus === 'loggedIn' ? <Redirect to="/all" /> : null}
     </>
   )
 }

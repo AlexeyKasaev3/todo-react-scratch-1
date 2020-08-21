@@ -1,12 +1,29 @@
+@import "../../scss/variables";
+
 .appContainer {
   max-width: 550px;
 }
 
 .appControlWrapper {
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 25px 50px 0 rgba(0, 0, 0, 0.1);
+  margin-bottom: 50px;
 }
 
 .authenticateButtonsWrapper {
   display: flex;
   justify-content: center;
+}
+
+.logoutButton {
+  display: block;
+  background-color: $headerColor;
+  color: white;
+  border-radius: 2px;
+  border: none;
+  outline: none;
+  margin: auto;
+  cursor: pointer;
+  padding: 10px 20px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
